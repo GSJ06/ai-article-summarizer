@@ -29,12 +29,15 @@ A Chrome extension that uses Google's Gemini AI to generate concise summaries of
 4. Save your settings
 
 ## Usage
+![image](https://github.com/user-attachments/assets/1f81bb76-55a1-4024-aa66-7100d410f7ea)
 
 1. Navigate to any article you want to summarize
 2. Click the extension icon in your Chrome toolbar
 3. Select your preferred summary type (Brief/Detailed/Bullets)
 4. Click "Summarize"
-5. Copy the generated summary with one click
+5. Copy the generated summary with one click.
+   
+![image](https://github.com/user-attachments/assets/243a96cc-7b43-47f4-9f5e-a541965c7bfd)
 
 ## Requirements
 
