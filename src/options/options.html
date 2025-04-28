@@ -1,0 +1,141 @@
+<!-- 
+  options.html
+  This file defines the options page interface for the AI Article Summarizer extension.
+  It provides a simple form for users to enter and save their Gemini API key.
+  
+  Features:
+  1. Clean, modern UI with responsive design
+  2. Input field for API key
+  3. Link to Google Cloud Console for API key generation
+  4. Save button with visual feedback
+  5. Success message display
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Extension options</title>
+    <style>
+        /* Base styles for the options page */
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            padding: 24px;
+            max-width: 500px;
+            margin: 0 auto;
+            background: #fafafa;
+            color: #333;
+        }
+
+        /* Form group styling for input fields */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        /* Label styling */
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #1a1a1a;
+        }
+
+        /* Input field styling with hover and focus states */
+        input[type="text"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-bottom: 12px;
+            transition: border-color 0.2s ease;
+        }
+
+        input[type="text"]:hover {
+            border-color: #007AFF;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #007AFF;
+            box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.1);
+        }
+
+        /* Paragraph text styling */
+        p {
+            font-size: 13px;
+            color: #666;
+            margin: 8px 0;
+            line-height: 1.5;
+        }
+
+        /* Link styling */
+        a {
+            color: #007AFF;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Button styling with hover effect */
+        button {
+            background: #007AFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            background: #0066CC;
+            transform: translateY(-1px);
+        }
+
+        /* Success message styling */
+        #success-message {
+            display: none;
+            margin-top: 12px;
+            padding: 8px 12px;
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        #success-message.show {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- API Key input form -->
+    <div class="form-group">
+        <label for="api-key">Gemini API Key</label>
+        <input type="text" id="api-key" placeholder="Enter your Gemini API key" />
+        <p>
+            Get your API key from <a href="https://aistudio.google.com/app/apikey" target="_blank">Google Cloud
+                Console</a>
+        </p>
+    </div>
+
+    <!-- Save button -->
+    <button id="save-btn">Save</button>
+
+    <!-- Success message (hidden by default) -->
+    <p id="success-message">Saved successfully</p>
+
+    <!-- Script for handling form submission and storage -->
+    <script src="options.js"></script>
+</body>
+
+</html>

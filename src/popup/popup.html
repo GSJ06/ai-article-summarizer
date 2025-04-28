@@ -1,0 +1,347 @@
+<!-- 
+  popup.html
+  This file defines the user interface for the AI Article Summarizer browser extension.
+  It creates a popup window that appears when users click the extension icon in their browser.
+
+  Key Features:
+  1. Provides a dropdown to select summary type (Brief, Detailed, or Bullet Points)
+  2. Contains buttons to trigger summarization and copy results
+  3. Displays the summarized content in a scrollable container
+  4. Shows loading states and copy confirmation messages
+  5. Implements a clean, modern UI with responsive design
+
+  The interface is styled using CSS variables for easy theming and includes:
+  - Custom scrollbars
+  - Loading animations
+  - Status messages
+  - Responsive layout that works across different screen sizes
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Summarizer</title>
+  <!-- Google Font - Inter for modern, clean typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* CSS Variables for theming - allows easy color scheme changes */
+    :root {
+      --primary: #4361ee;
+      --primary-hover: #3a56d4;
+      --secondary: #10b981;
+      --secondary-hover: #0ea271;
+      --text: #333;
+      --text-light: #666;
+      --background: #fff;
+      --border: #e5e7eb;
+      --shadow: rgba(0, 0, 0, 0.05);
+      --radius: 8px;
+    }
+
+    /* Reset and base styles for consistent rendering across browsers */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Main container styles with minimum dimensions to prevent UI squishing */
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-width: 520px;
+      min-height: 320px;
+      padding: 20px;
+      background-color: var(--background);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    /* Layout containers for organized content structure */
+    .container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    /* Header section with title */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: var(--text);
+      margin: 0;
+    }
+
+    /* Controls section containing summary type selector and action buttons */
+    .controls {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+      align-items: center;
+    }
+
+    /* Summary type dropdown styling */
+    #summary-type {
+      flex: 1;
+      padding: 10px 12px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      font-family: inherit;
+      font-size: 0.9rem;
+      color: var(--text);
+      background-color: var(--background);
+      box-shadow: 0 1px 2px var(--shadow);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    #summary-type:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+    }
+
+    /* Button container for action buttons */
+    .button-container {
+      display: flex;
+      gap: 10px;
+    }
+
+    /* Button styles with hover and active states */
+    button {
+      padding: 10px 16px;
+      border-radius: var(--radius);
+      border: none;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    /* Primary action button (Summarize) */
+    #summarize {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    #summarize:hover {
+      background-color: var(--primary-hover);
+    }
+
+    /* Secondary action button (Copy) */
+    #copy-btn {
+      background-color: var(--secondary);
+      color: white;
+    }
+
+    #copy-btn:hover {
+      background-color: var(--secondary-hover);
+    }
+
+    /* Result container for displaying summarized content */
+    #result-container {
+      flex: 1;
+      position: relative;
+      margin-top: 8px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background-color: #f9fafb;
+      overflow: hidden;
+      box-shadow: 0 1px 3px var(--shadow);
+    }
+
+    /* Result text area with custom scrollbar */
+    #result {
+      height: 100%;
+      min-height: 200px;
+      max-height: 400px;
+      padding: 16px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      font-size: 0.95rem;
+      color: var(--text);
+      line-height: 1.6;
+      background-color: transparent;
+      border: none;
+      outline: none;
+      resize: none;
+    }
+
+    /* Custom scrollbar styling for better UX */
+    #result::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    #result::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    #result::-webkit-scrollbar-thumb {
+      background-color: #d1d5db;
+      border-radius: 20px;
+    }
+
+    /* List styling for bullet point summaries */
+    #result ul {
+      padding-left: 20px;
+    }
+
+    #result li {
+      margin-bottom: 8px;
+    }
+
+    /* Loading overlay for processing states */
+    .loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(2px);
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .loading-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* Loading spinner animation */
+    .loader {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid var(--primary);
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 0.8s linear infinite;
+    }
+
+    /* Status message for copy confirmation */
+    .status-message {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 8px 12px;
+      background-color: var(--secondary);
+      color: white;
+      border-radius: var(--radius);
+      font-size: 0.8rem;
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: opacity 0.3s, transform 0.3s;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .status-message.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Animation keyframes for loading spinner */
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* SVG icon styling for buttons */
+    .icon {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      stroke-width: 2;
+      stroke: currentColor;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Main container for all content -->
+  <div class="container">
+    <!-- Header with extension title -->
+    <header>
+      <h2>AI Summarizer</h2>
+    </header>
+
+    <!-- Controls section with summary type selector and action buttons -->
+    <div class="controls">
+      <select id="summary-type">
+        <option value="brief">Brief Summary</option>
+        <option value="detailed">Detailed Summary</option>
+        <option value="bullets">Bullet Points</option>
+      </select>
+
+      <div class="button-container">
+        <!-- Summarize button with plus icon -->
+        <button id="summarize">
+          <svg class="icon" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="16" />
+            <line x1="8" y1="12" x2="16" y2="12" />
+          </svg>
+          Summarize
+        </button>
+        <!-- Copy button with copy icon -->
+        <button id="copy-btn">
+          <svg class="icon" viewBox="0 0 24 24">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+            <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+          </svg>
+          Copy
+        </button>
+      </div>
+    </div>
+
+    <!-- Result container for displaying summarized content -->
+    <div id="result-container">
+      <pre id="result">Select a summary type and click Summarize to analyze the current page.</pre>
+
+      <!-- Loading overlay for processing states -->
+      <div id="loading-overlay" class="loading-overlay">
+        <div class="loader"></div>
+      </div>
+    </div>
+
+    <!-- Status message for copy confirmation -->
+    <div id="status-message" class="status-message">Copied to clipboard!</div>
+  </div>
+
+  <!-- Script for handling user interactions and API calls -->
+  <script src="popup.js"></script>
+</body>
+
+</html>
